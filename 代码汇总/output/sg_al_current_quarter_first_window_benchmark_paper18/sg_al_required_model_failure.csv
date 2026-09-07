@@ -1,0 +1,19 @@
+﻿layer,model_name,fit_stage,fold_id,status,error_message,fit_rows,predict_rows,feature_count,model_parallel_jobs,model_inner_max_threads,elapsed_seconds,window_id,iteration
+layer_1,LDA,oof,0,success,,46083,9007,143,2,1,0.8958233999999999,1,1
+layer_1,QDA,oof,0,success,,46083,9007,143,2,1,0.6000926000000001,1,1
+layer_1,Logit,oof,0,success,,46083,9007,143,2,1,25.0274609,1,1
+layer_1,Probit,oof,0,success,,46083,9007,143,2,1,4.377775400000001,1,1
+layer_1,NaiveBayes,oof,0,success,,46083,9007,143,2,1,0.1220756999999999,1,1
+layer_1,Tree-ID3,oof,0,success,,46083,9007,143,2,1,7.4185556,1,1
+layer_1,Tree-C4.5,oof,0,success,,46083,9007,143,2,1,7.4203765,1,1
+layer_1,Tree-CART,oof,0,success,,46083,9007,143,2,1,7.305442899999999,1,1
+layer_1,FNN1,oof,0,success,,46083,9007,143,2,1,12.803452899999996,1,1
+layer_1,FNN2,oof,0,success,,46083,9007,143,2,1,17.467789500000002,1,1
+layer_1,FNN3,oof,0,success,,46083,9007,143,2,1,22.264547800000003,1,1
+layer_1,SVM-Lin,oof,0,success,,46083,9007,143,2,1,2281.3888759,1,1
+layer_1,SVM-Poly,oof,0,success,,46083,9007,143,2,1,450.3487847,1,1
+layer_1,SVM-RBF,oof,0,success,,46083,9007,143,2,1,360.8979618,1,1
+layer_1,KNN,oof,0,success,,46083,9007,143,2,1,4.144307799999979,1,1
+layer_1,NCA,oof,0,failed,"MemoryError: Unable to allocate 15.8 GiB for an array with shape (46083, 46083) and data type float64",46083,9007,143,2,1,487.62998460000006,1,1
+layer_1,ITML,oof,0,success,,46083,9007,143,2,1,5.7346555000001445,1,1
+layer_1,LMNN,oof,0,success,,46083,9007,143,2,1,18133.6207336,1,1

@@ -1,0 +1,20 @@
+﻿layer,model_name,fit_stage,fold_id,status,error_message,fit_rows,predict_rows,feature_count,model_parallel_jobs,effective_model_parallel_jobs,model_inner_max_threads,scheduler_mode,model_position,model_count,worker_pid,started_at,elapsed_seconds,finished_at,window_id,iteration
+layer_1,LDA,oof,0,success,,20462,9007,143,6,6,1,parallel_loky,1,18,83332,2026-07-28 16:31:36+0800,0.42894909999999875,2026-07-28 16:31:37+0800,1,1
+layer_1,QDA,oof,0,success,,20462,9007,143,6,6,1,parallel_loky,2,18,83332,2026-07-28 16:31:37+0800,0.30401099999999914,2026-07-28 16:31:37+0800,1,1
+layer_1,Logit,oof,0,success,,20462,9007,143,6,6,1,parallel_loky,3,18,79828,2026-07-28 16:31:33+0800,15.2845043,2026-07-28 16:31:49+0800,1,1
+layer_1,Probit,oof,0,success,,20462,9007,143,6,6,1,parallel_loky,4,18,79828,2026-07-28 16:31:32+0800,1.7657243999999999,2026-07-28 16:31:33+0800,1,1
+layer_1,NaiveBayes,oof,0,success,,20462,9007,143,6,6,1,parallel_loky,5,18,83332,2026-07-28 16:31:37+0800,0.07547480000000029,2026-07-28 16:31:37+0800,1,1
+layer_1,Tree-ID3,oof,0,success,,20462,9007,143,6,6,1,parallel_loky,6,18,83332,2026-07-28 16:31:37+0800,3.193149100000001,2026-07-28 16:31:40+0800,1,1
+layer_1,Tree-C4.5,oof,0,success,,20462,9007,143,6,6,1,parallel_loky,7,18,87772,2026-07-28 16:31:38+0800,3.163140200000001,2026-07-28 16:31:41+0800,1,1
+layer_1,Tree-CART,oof,0,success,,20462,9007,143,6,6,1,parallel_loky,8,18,83332,2026-07-28 16:31:40+0800,3.1975682999999986,2026-07-28 16:31:43+0800,1,1
+layer_1,FNN1,oof,0,success,,20462,9007,143,6,6,1,parallel_loky,9,18,79828,2026-07-28 16:31:26+0800,5.8442554,2026-07-28 16:31:31+0800,1,1
+layer_1,FNN2,oof,0,success,,20462,9007,143,6,6,1,parallel_loky,10,18,83332,2026-07-28 16:31:26+0800,8.3000524,2026-07-28 16:31:34+0800,1,1
+layer_1,FNN3,oof,0,success,,20462,9007,143,6,6,1,parallel_loky,11,18,87772,2026-07-28 16:31:26+0800,10.3260503,2026-07-28 16:31:36+0800,1,1
+layer_1,SVM-Lin,oof,0,success,,20462,9007,143,6,6,1,parallel_loky,12,18,97220,2026-07-28 16:31:26+0800,226.1284611,2026-07-28 16:35:12+0800,1,1
+layer_1,SVM-Poly,oof,0,success,,20462,9007,143,6,6,1,parallel_loky,13,18,99100,2026-07-28 16:31:26+0800,49.2548915,2026-07-28 16:32:15+0800,1,1
+layer_1,SVM-RBF,oof,0,success,,20462,9007,143,6,6,1,parallel_loky,14,18,105212,2026-07-28 16:31:26+0800,59.1249075,2026-07-28 16:32:25+0800,1,1
+layer_1,KNN,oof,0,success,,20462,9007,143,6,6,1,parallel_loky,15,18,87772,2026-07-28 16:31:36+0800,1.8677683000000016,2026-07-28 16:31:38+0800,1,1
+layer_1,NCA,oof,0,success,,20462,9007,143,6,1,1,exclusive_spawn,16,18,94672,2026-07-28 16:19:45+0800,700.0578257999999,2026-07-28 16:31:25+0800,1,1
+layer_1,ITML,oof,0,success,,20462,9007,143,6,6,1,parallel_loky,17,18,83332,2026-07-28 16:31:34+0800,2.1870788,2026-07-28 16:31:36+0800,1,1
+layer_1,RCA,oof,0,failed,"ValueError: Input X contains NaN.
+KNeighborsClassifier does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values",20462,9007,143,6,6,1,parallel_loky,18,18,87772,2026-07-28 16:31:36+0800,0.18234969999999961,2026-07-28 16:31:36+0800,1,1

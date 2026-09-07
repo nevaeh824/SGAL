@@ -1,0 +1,35 @@
+# Local source datasets and serialized matrices
+/代码汇总/data/**/*.csv
+/代码汇总/data/**/*.xlsx
+/代码汇总/data/**/*.pkl
+/代码汇总/data/**/*.log
+/代码汇总/data/**/*.err
+/代码汇总/data/**/*.txt
+/代码汇总/单个公司股票原始数据/
+/代码汇总/mnsc.2023.03604/data/
+/代码汇总/mnsc.2023.03604/log/
+/代码汇总/mnsc.2023.03604/model/
+/代码汇总/mnsc.2023.03604/terms/
+/代码汇总/mnsc.2023.03604/news/*.csv
+/代码汇总/mnsc.2023.03604/others/*.xlsx
+/代码汇总/mnsc.2023.03604/variable_dictionary.xlsx
+
+# Outputs that exceed GitHub's per-file limits
+/代码汇总/output/final_merged_0509_cts.csv
+/代码汇总/output/final_merged_inner_cts_0509.csv
+/代码汇总/output/final_merged_0509_cts_cleaned_FSFP.csv
+
+# Browser QA profiles may contain local browser state
+/代码汇总/output/**/chrome_qa_profile*/
+
+# Generated caches
+**/__pycache__/
+*.py[cod]
+
+# Local archives, papers, shortcuts, and presentation files
+/*.lnk
+/*.pdf
+/*.pptx
+/*.zip
+/代码汇总/*.pdf
+/代码汇总/*.zip

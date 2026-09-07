@@ -1,0 +1,513 @@
+{
+  "surface": "report",
+  "manifest": {
+    "version": 1,
+    "surface": "report",
+    "title": "PeerMeta 首窗口执行结果与服务器容量评估",
+    "description": "基于 17 模型、3 年训练窗口成功运行的 850 次逐模型日志，复核模型效果、关键路径、NCA 内存风险和服务器并发收益。",
+    "generatedAt": "2026-08-03T14:45:52+08:00",
+    "cards": [
+      {
+        "id": "wall_time_card",
+        "description": "2026-07-28 17:27 至 2026-07-31 02:24 的实测总墙钟小时数。",
+        "dataset": "run_summary",
+        "sourceId": "benchmark_summary",
+        "metrics": [
+          {"label": "总墙钟（小时）", "field": "wall_hours", "format": "number"}
+        ]
+      },
+      {
+        "id": "accuracy_card",
+        "description": "2018Q1 共 2,892 条测试记录的整体准确率。",
+        "dataset": "run_summary",
+        "sourceId": "benchmark_summary",
+        "metrics": [
+          {"label": "Accuracy", "field": "accuracy", "format": "percent"}
+        ]
+      },
+      {
+        "id": "macro_f1_card",
+        "description": "三类等权的宏平均 F1。",
+        "dataset": "run_summary",
+        "sourceId": "benchmark_summary",
+        "metrics": [
+          {"label": "Macro F1", "field": "macro_f1", "format": "percent"}
+        ]
+      },
+      {
+        "id": "nca_share_card",
+        "description": "50 次 NCA 拟合耗时占总墙钟的比例。",
+        "dataset": "run_summary",
+        "sourceId": "model_log",
+        "metrics": [
+          {"label": "NCA 墙钟占比", "field": "nca_wall_share", "format": "percent"}
+        ]
+      },
+      {
+        "id": "fit_success_card",
+        "description": "17 个模型 × 每模型 50 次，全部成功。",
+        "dataset": "run_summary",
+        "sourceId": "model_log",
+        "metrics": [
+          {"label": "成功拟合", "field": "fit_success", "format": "number"}
+        ]
+      },
+      {
+        "id": "recommended_ram_card",
+        "description": "两条 NCA 通道的最低推荐物理内存；128 GiB 提供更大峰值余量。",
+        "dataset": "run_summary",
+        "sourceId": "capacity_replay",
+        "metrics": [
+          {"label": "推荐内存（GiB）", "field": "recommended_ram_gib", "format": "number"}
+        ]
+      }
+    ],
+    "charts": [
+      {
+        "id": "runtime_by_model",
+        "title": "逐模型累计拟合耗时",
+        "subtitle": "NCA 占全部逐模型耗时的 90.6%；普通模型并发已不是主瓶颈。",
+        "type": "bar",
+        "dataset": "model_runtime",
+        "sourceId": "model_log",
+        "valueFormat": "number",
+        "encodings": {
+          "x": {"field": "model", "type": "nominal", "label": "模型"},
+          "y": {"field": "hours", "type": "quantitative", "label": "累计小时"},
+          "tooltip": [
+            {"field": "share", "type": "quantitative", "label": "逐模型耗时占比", "format": "percent"}
+          ]
+        }
+      },
+      {
+        "id": "capacity_time_chart",
+        "title": "服务器并发方案的日志回放耗时",
+        "subtitle": "使用本次每个 NCA 拟合的实际耗时重放依赖关系；未计入新硬件速度差异与并发争用。",
+        "type": "bar",
+        "dataset": "capacity_scenarios",
+        "sourceId": "capacity_replay",
+        "valueFormat": "number",
+        "encodings": {
+          "x": {"field": "scenario", "type": "nominal", "label": "物理内存 / 调度"},
+          "y": {"field": "replay_hours", "type": "quantitative", "label": "总墙钟小时"},
+          "tooltip": [
+            {"field": "speedup", "type": "quantitative", "label": "相对实测速率", "format": "number"},
+            {"field": "lower_peak_gib", "type": "quantitative", "label": "NCA 核心矩阵下界 GiB", "format": "number"}
+          ]
+        }
+      },
+      {
+        "id": "iteration_quality_chart",
+        "title": "SG-AL 每轮入选样本质量",
+        "subtitle": "第 10 轮是剩余难例尾部：准确率和 Macro F1 同时明显下降。",
+        "type": "line",
+        "dataset": "iteration_quality_long",
+        "sourceId": "predictions",
+        "valueFormat": "percent",
+        "encodings": {
+          "x": {"field": "iteration", "type": "quantitative", "label": "SG-AL 轮次"},
+          "y": {"field": "score", "type": "quantitative", "label": "分数"},
+          "color": {"field": "metric", "type": "nominal", "label": "指标"},
+          "tooltip": [
+            {"field": "selected_n", "type": "quantitative", "label": "本轮入选数", "format": "number"},
+            {"field": "p_std_mean", "type": "quantitative", "label": "平均 p_std", "format": "number"}
+          ]
+        }
+      }
+    ],
+    "tables": [
+      {
+        "id": "capacity_table",
+        "title": "内存、可行调度与耗时区间",
+        "subtitle": "规划内存 = NCA 核心矩阵下界 × 1.25 + 8 GiB；实际采购按常见容量档位上取整。",
+        "dataset": "capacity_scenarios",
+        "sourceId": "capacity_replay",
+        "columns": [
+          {"field": "scenario", "label": "配置", "type": "text"},
+          {"field": "schedule", "label": "安全调度", "type": "text"},
+          {"field": "lower_peak_gib", "label": "矩阵下界 GiB", "format": "number"},
+          {"field": "planning_memory_gib", "label": "规划需求 GiB", "format": "number"},
+          {"field": "replay_hours", "label": "日志回放小时", "format": "number"},
+          {"field": "same_core_range", "label": "同级单核现实区间", "type": "text"},
+          {"field": "decision", "label": "判断", "type": "text"}
+        ]
+      },
+      {
+        "id": "class_metrics_table",
+        "title": "按类别的识别效果",
+        "subtitle": "类别 2 精确率高但召回率仅 66.24%，模型明显少报该类。",
+        "dataset": "class_metrics",
+        "sourceId": "predictions",
+        "defaultSort": {"field": "class", "direction": "asc"},
+        "columns": [
+          {"field": "class", "label": "类别", "type": "text"},
+          {"field": "precision", "label": "Precision", "format": "percent"},
+          {"field": "recall", "label": "Recall", "format": "percent"},
+          {"field": "f1", "label": "F1", "format": "percent"},
+          {"field": "support", "label": "真实数量", "format": "number"},
+          {"field": "predicted", "label": "预测数量", "format": "number"}
+        ]
+      },
+      {
+        "id": "nca_memory_table",
+        "title": "第 10 轮 NCA 样本数与内存下界",
+        "subtitle": "第一层四个任务互相独立；第二层完整训练依赖第一层输出，不能同时启动。",
+        "dataset": "nca_memory_tasks",
+        "sourceId": "memory_model",
+        "columns": [
+          {"field": "task", "label": "NCA 任务", "type": "text"},
+          {"field": "fit_rows", "label": "拟合行数", "format": "number"},
+          {"field": "lower_gib", "label": "矩阵下界 GiB", "format": "number"},
+          {"field": "first_layer_overlap", "label": "能否与第一层其他 NCA 重叠", "type": "text"}
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "id": "analysis_snapshot",
+        "label": "PeerMeta 首窗口执行复核快照",
+        "query": {
+          "engine": "pandas + deterministic trace replay",
+          "description": "交叉核对成功摘要、850 行模型日志、2,892 行预测、逐轮日志和指标文件。",
+          "tables_used": [
+            "output/sg_al_current_quarter_first_window_3year_benchmark_model17_nca_full/benchmark_summary.json",
+            "output/sg_al_current_quarter_first_window_3year_benchmark_model17_nca_full/model_log.csv",
+            "output/sg_al_current_quarter_first_window_3year_benchmark_model17_nca_full/predictions.csv",
+            "output/sg_al_current_quarter_first_window_3year_benchmark_model17_nca_full/iteration_log.csv",
+            "output/sg_al_current_quarter_first_window_3year_benchmark_model17_nca_full/metrics.csv"
+          ]
+        }
+      },
+      {
+        "id": "benchmark_summary",
+        "label": "首窗口成功运行摘要",
+        "path": "output/sg_al_current_quarter_first_window_3year_benchmark_model17_nca_full/benchmark_summary.json",
+        "query": {
+          "engine": "SQLite 3 over reviewed file snapshot",
+          "sql": "SELECT total_wall_seconds / 3600.0 AS wall_hours, accuracy, macro_f1, weighted_f1, total_model_fit_count AS fit_total, train_rows, test_rows FROM benchmark_summary;",
+          "description": "Selects the successful-run headline metrics after loading benchmark_summary.json as a one-row table.",
+          "tables_used": ["benchmark_summary"]
+        }
+      },
+      {
+        "id": "model_log",
+        "label": "850 次逐模型拟合日志",
+        "path": "output/sg_al_current_quarter_first_window_3year_benchmark_model17_nca_full/model_log.csv",
+        "query": {
+          "engine": "SQLite 3 over reviewed CSV snapshot",
+          "sql": "WITH runtimes AS (SELECT model_name AS model, SUM(elapsed_seconds) / 3600.0 AS hours FROM model_log GROUP BY model_name), ranked AS (SELECT model, hours, ROW_NUMBER() OVER (ORDER BY hours DESC) AS runtime_rank, SUM(hours) OVER () AS all_model_hours FROM runtimes) SELECT model, hours, hours / all_model_hours AS share FROM ranked WHERE runtime_rank <= 6 UNION ALL SELECT 'Other 11 models', SUM(hours), SUM(hours) / MAX(all_model_hours) FROM ranked WHERE runtime_rank > 6;",
+          "description": "Aggregates 850 successful fits into the top six model runtimes plus the remaining eleven models.",
+          "tables_used": ["model_log"]
+        }
+      },
+      {
+        "id": "predictions",
+        "label": "2018Q1 测试集预测明细",
+        "path": "output/sg_al_current_quarter_first_window_3year_benchmark_model17_nca_full/predictions.csv",
+        "query": {
+          "engine": "SQLite 3 over reviewed CSV snapshot",
+          "sql": "SELECT iteration, true_label, pred_label, p_std, agreement_rate FROM predictions;",
+          "description": "Selects the fields used to calculate per-iteration quality, class metrics, and uncertainty slices.",
+          "tables_used": ["predictions"]
+        }
+      },
+      {
+        "id": "capacity_replay",
+        "label": "NCA 并发容量与关键路径回放",
+        "path": "output/peermeta_first_window_execution_analysis_20260803/capacity_replay.csv",
+        "query": {
+          "engine": "deterministic scheduling replay",
+          "sql": "SELECT * FROM capacity_replay;",
+          "description": "每轮第一层的完整训练 NCA 与三个 OOF NCA 视为四个独立任务；第二层 NCA 在第一层完成后执行。两通道方案把完整训练放在一条通道、三个 OOF 顺序放在另一条通道。",
+          "tables_used": ["capacity_replay", "model_log"],
+          "metric_definitions": {
+            "memory_lower_bound": "33 * n_samples^2 bytes / 2^30",
+            "planning_memory": "memory_lower_bound * 1.25 + 8 GiB",
+            "trace_replay_total": "replayed NCA critical path + observed 3.11 hours of non-NCA wall time and overhead"
+          }
+        }
+      },
+      {
+        "id": "memory_model",
+        "label": "NCA 第 10 轮矩阵内存模型",
+        "path": "output/peermeta_first_window_execution_analysis_20260803/memory_model.csv",
+        "query": {
+          "engine": "scikit-learn 1.3.2 source inspection",
+          "sql": "SELECT * FROM memory_model;",
+          "tables_used": ["memory_model", "model_log"],
+          "description": "NeighborhoodComponentsAnalysis._loss_grad_lbfgs 常驻 same_class_mask 与四个 n×n 矩阵；33*n² 字节是核心矩阵下界，不是进程峰值 RSS。"
+        }
+      }
+    ],
+    "blocks": [
+      {
+        "id": "technical_summary",
+        "type": "markdown",
+        "layout": "full",
+        "sourceId": "analysis_snapshot",
+        "body": "## 技术结论\n\n当前 17 模型首窗口已经完整成功：850/850 次拟合均为 `success`，测试池在 10 轮 SG-AL 后清空，最终 Accuracy 为 **81.98%**、Macro F1 为 **80.39%**，总墙钟 **56 小时 57 分**。\n\n性能瓶颈不是普通模型，而是 NCA：50 次 NCA 累计 **53.85 小时**，相当于总墙钟的 **94.54%**。若保持 NCA 全样本不变，建议服务器至少 **96 GiB RAM**，采用 **2 条 NCA 通道**；生产稳妥配置为 **128 GiB RAM**。按本次日志原样回放，两通道总耗时约 **34.67 小时**；考虑服务器单核差异和内存带宽争用，现实规划按 **35–42 小时**。"
+      },
+      {
+        "id": "headline_metrics",
+        "type": "metric-strip",
+        "cardIds": ["wall_time_card", "accuracy_card", "macro_f1_card", "nca_share_card", "fit_success_card", "recommended_ram_card"]
+      },
+      {
+        "id": "key_findings_runtime",
+        "type": "markdown",
+        "sourceId": "model_log",
+        "body": "## 关键发现：NCA 决定了总工期\n\n普通 16 模型已经以最多 6 个 `loky` 进程运行。SVM-Lin 的 50 次拟合累计 3.05 小时，其余每种模型都低于 0.88 小时；而 NCA 单独达到 53.85 小时，最慢一次完整训练为 174.4 分钟。因此继续把普通模型并发从 6 提高到 12，最多只能挤压约 3.11 小时的非 NCA 墙钟，不会改变数量级。"
+      },
+      {"id": "runtime_chart_block", "type": "chart", "chartId": "runtime_by_model"},
+      {
+        "id": "capacity_decision",
+        "type": "markdown",
+        "sourceId": "capacity_replay",
+        "body": "## 服务器容量与并发设计\n\n第 10 轮第一层完整训练有 32,079 行，NCA 核心矩阵下界约 31.63 GiB；把它与最大 OOF NCA 同时运行，下界升到 47.99 GiB。按 25% 临时数组余量再为操作系统、父进程和普通模型预留 8 GiB，规划需求约 67.98 GiB，因此 **64 GiB 不适合完整训练与 OOF 同时跑，96 GiB 是两通道最低推荐值**。\n\n四个第一层 NCA 同时启动的下界约 74.10 GiB，规划需求约 100.62 GiB，对应 128 GiB。但四通道几乎不比两通道快：本次每一轮的完整训练 NCA 都大致覆盖了三个 OOF NCA 的合计时长，两条通道已经把依赖图压到关键路径。"
+      },
+      {"id": "capacity_chart_block", "type": "chart", "chartId": "capacity_time_chart"},
+      {"id": "capacity_table_block", "type": "table", "tableId": "capacity_table"},
+      {"id": "memory_task_table_block", "type": "table", "tableId": "nca_memory_table"},
+      {
+        "id": "quality_findings",
+        "type": "markdown",
+        "sourceId": "predictions",
+        "body": "## 当前执行结果的模型含义\n\n整体结果可用，但类别 2 是主要弱点：真实 545 条，只预测出 407 条，Precision 为 88.70%，Recall 仅 66.24%；184 个漏报中，99 个被判为类别 0，85 个被判为类别 1。\n\n不确定性对难例有明显区分力：`p_std=0` 的 2,655 条样本 Accuracy 为 83.73%、Macro F1 为 82.18%；`p_std>0` 的 237 条样本分别只有 62.45% 和 47.65%。但“全模型一致”不能视作正确性保证——第 4 轮平均一致率仍为 100%，Accuracy 却只有 73.45%。第 10 轮是最难的剩余尾部，Accuracy 降到 68.09%、Macro F1 降到 54.96%。"
+      },
+      {"id": "iteration_quality_block", "type": "chart", "chartId": "iteration_quality_chart"},
+      {"id": "class_metrics_block", "type": "table", "tableId": "class_metrics_table"},
+      {
+        "id": "scope_and_definitions",
+        "type": "markdown",
+        "sourceId": "benchmark_summary",
+        "body": "## 范围、数据与定义\n\n- 周频输入 1,743,672 行，经季度化得到 140,275 行；特征数 143，数值强制转缺失为 0。\n- 训练窗口为 2015Q1–2017Q4，共 29,469 行；测试季度为 2018Q1，共 2,892 行。\n- 第一层为 3 折 OOF，每折覆盖连续 4 个季度；SG-AL 共 10 轮，前 9 轮各选择 290 条，第 10 轮选择剩余 282 条。\n- 这是同季度识别：第 t 季度最后可用周的特征识别第 t 季度 FSFP，并不是用 t 季度信息预测 t+1 季度标签。"
+      },
+      {
+        "id": "methodology",
+        "type": "markdown",
+        "sourceId": "capacity_replay",
+        "body": "## 容量估算方法\n\n耗时估算不是按模型数做简单除法，而是逐轮重放实际依赖：第一层完整训练 NCA 与三个 OOF NCA 可以并行，第二层 NCA 必须等待第一层元特征产生。两通道的最优布置是“一条通道跑完整训练，另一条通道依次跑三个 OOF”；然后再执行第二层 NCA。最终把重放后的 NCA 关键路径与本次实测的 3.11 小时非 NCA 墙钟及框架开销相加。\n\n内存下界来自 scikit-learn 1.3.2 的 NCA 损失函数：一个布尔类掩码和四个 float64 的 n×n 矩阵，合计约 33n² 字节。softmax、距离计算、复制、模型输入、子进程和操作系统还会制造临时峰值，因此报告额外使用 25% 系数和 8 GiB 固定预留。"
+      },
+      {
+        "id": "limitations",
+        "type": "markdown",
+        "sourceId": "analysis_snapshot",
+        "body": "## 限制与不确定性\n\n1. 只有一个 2018Q1 窗口，81.98% Accuracy 不能替代正式多季度外推验证。\n2. 当前没有运行期逐进程峰值 RSS、页面换入换出和内存带宽监控；31.63/47.99/74.10 GiB 是可解释下界，不是实测峰值。\n3. 34.67 小时是使用旧机器每次拟合耗时的调度回放值；新服务器的单核性能、NUMA 和并发带宽争用会让实际值上下波动。当前机器本身是 20 物理核心、32 GiB DDR5-5600，服务器核心更多不等于 NCA 单次拟合更快。\n4. 当前注册表中 FNN、决策树等模型没有统一固定 `random_state`；单次运行结果尚未给出重复性区间。名为 Probit 的模型实际是 SAG Logistic，ID3 与 C4.5 当前都使用 entropy。\n5. 当前成功日志是在整个窗口结束后统一写出；若未来长任务中途终止，仍缺少逐模型持久化与断点恢复。"
+      },
+      {
+        "id": "recommendations",
+        "type": "markdown",
+        "body": "## 建议的下一步\n\n1. **首选 96 GiB / 2 通道试跑**：16–32 个物理核心、较高内存带宽、NVMe；保持每个 NCA 内部线程 1，普通模型使用一个全局 4–6 进程池，禁止 OOF 池与模型池相乘。\n2. 调度改为第一层双通道：通道 A 跑 full NCA，通道 B 顺序跑 OOF0–2；第二层 NCA 仍单独运行。普通模型任务放入唯一全局队列，可在内存监控允许时与 NCA 重叠。\n3. 上机先只跑第 10 轮规模的 5 次 NCA 基准，记录峰值 RSS、page faults、内存带宽和每次耗时。若 full + 最大 OOF 的实测峰值超过约 80 GiB，直接选 128 GiB。\n4. 若服务器实测能让单次 NCA 加速 1.3–1.5 倍，两通道预计可进一步到约 24–27 小时；这是条件预测，必须以第 10 轮基准确认。\n5. 在正式全季度运行前补上模型完成即追加日志、折级检查点、配置指纹和成功模型跳过机制。"
+      },
+      {
+        "id": "further_questions",
+        "type": "markdown",
+        "body": "## 后续需要回答的问题\n\n- 目标是只加速当前 3 年首窗口，还是还要覆盖正式 5 年、5 折的多季度任务？后者的 NCA 样本数和并发内存需要重新按每个窗口计算。\n- 更看重采购成本还是最短工期？当前依赖图下，96 GiB 与 128 GiB 的计算时间几乎一致，128 GiB 的主要价值是稳定余量。\n- 是否允许调整 NCA 参数、降维或样本上限？如果坚持完全不改 NCA，低于 20 小时主要依赖单次拟合硬件加速，而不是继续增加并发通道。"
+      }
+    ]
+  },
+  "snapshot": {
+    "version": 1,
+    "generatedAt": "2026-08-03T14:45:52+08:00",
+    "status": "partial",
+    "datasets": {
+      "run_summary": [
+        {
+          "wall_hours": 56.962331,
+          "accuracy": 0.819848,
+          "macro_f1": 0.803906,
+          "weighted_f1": 0.81752,
+          "fit_success": 850,
+          "fit_total": 850,
+          "train_rows": 29469,
+          "test_rows": 2892,
+          "nca_hours": 53.851701,
+          "nca_wall_share": 0.945391,
+          "recommended_ram_gib": 96
+        }
+      ],
+      "model_runtime": [
+        {"model": "NCA", "hours": 53.851701, "share": 0.905971},
+        {"model": "SVM-Lin", "hours": 3.046551, "share": 0.051253},
+        {"model": "SVM-RBF", "hours": 0.872335, "share": 0.014676},
+        {"model": "SVM-Poly", "hours": 0.82949, "share": 0.013955},
+        {"model": "Logit", "hours": 0.201752, "share": 0.003394},
+        {"model": "FNN3", "hours": 0.175315, "share": 0.002949},
+        {"model": "其他 11 个模型", "hours": 0.463743, "share": 0.007802}
+      ],
+      "capacity_scenarios": [
+        {
+          "scenario": "当前 32 GiB",
+          "ram_gib": 31.65,
+          "schedule": "NCA 完全串行（实测）",
+          "lower_peak_gib": 31.63,
+          "planning_memory_gib": 47.53,
+          "replay_hours": 56.96,
+          "speedup": 1.0,
+          "same_core_range": "实测 56.96 h",
+          "decision": "完成但依赖虚拟内存，无安全余量"
+        },
+        {
+          "scenario": "64 GiB / 分阶段双 OOF",
+          "ram_gib": 64,
+          "schedule": "full 独占；OOF 最多 2 路",
+          "lower_peak_gib": 31.63,
+          "planning_memory_gib": 47.53,
+          "replay_hours": 48.02,
+          "speedup": 1.19,
+          "same_core_range": "45–50 h",
+          "decision": "安全但提速有限"
+        },
+        {
+          "scenario": "96 GiB / 2 条 NCA 通道",
+          "ram_gib": 96,
+          "schedule": "full 一路；3 个 OOF 共用另一路",
+          "lower_peak_gib": 47.99,
+          "planning_memory_gib": 67.98,
+          "replay_hours": 34.67,
+          "speedup": 1.64,
+          "same_core_range": "35–42 h",
+          "decision": "最佳性价比，最低推荐"
+        },
+        {
+          "scenario": "128 GiB / 4 条 NCA 通道",
+          "ram_gib": 128,
+          "schedule": "第一层 4 个 NCA 同时运行",
+          "lower_peak_gib": 74.1,
+          "planning_memory_gib": 100.62,
+          "replay_hours": 34.66,
+          "speedup": 1.64,
+          "same_core_range": "35–43 h",
+          "decision": "余量更稳，但几乎不再提速"
+        }
+      ],
+      "nca_memory_tasks": [
+        {"task": "第一层 full train", "fit_rows": 32079, "lower_gib": 31.63, "first_layer_overlap": "可以"},
+        {"task": "第一层 OOF fold 0", "fit_rows": 23072, "lower_gib": 16.36, "first_layer_overlap": "可以"},
+        {"task": "第一层 OOF fold 1", "fit_rows": 22207, "lower_gib": 15.16, "first_layer_overlap": "可以"},
+        {"task": "第一层 OOF fold 2", "fit_rows": 18879, "lower_gib": 10.95, "first_layer_overlap": "可以"},
+        {"task": "第二层 full train", "fit_rows": 32079, "lower_gib": 31.63, "first_layer_overlap": "不可以；依赖第一层输出"}
+      ],
+      "iteration_quality_long": [
+        {"iteration": 1, "metric": "Accuracy", "score": 0.87931, "selected_n": 290, "p_std_mean": 0.0},
+        {"iteration": 1, "metric": "Macro F1", "score": 0.858368, "selected_n": 290, "p_std_mean": 0.0},
+        {"iteration": 2, "metric": "Accuracy", "score": 0.803448, "selected_n": 290, "p_std_mean": 0.0},
+        {"iteration": 2, "metric": "Macro F1", "score": 0.74939, "selected_n": 290, "p_std_mean": 0.0},
+        {"iteration": 3, "metric": "Accuracy", "score": 0.8, "selected_n": 290, "p_std_mean": 0.0},
+        {"iteration": 3, "metric": "Macro F1", "score": 0.790185, "selected_n": 290, "p_std_mean": 0.0},
+        {"iteration": 4, "metric": "Accuracy", "score": 0.734483, "selected_n": 290, "p_std_mean": 0.0},
+        {"iteration": 4, "metric": "Macro F1", "score": 0.729753, "selected_n": 290, "p_std_mean": 0.0},
+        {"iteration": 5, "metric": "Accuracy", "score": 0.8, "selected_n": 290, "p_std_mean": 0.0},
+        {"iteration": 5, "metric": "Macro F1", "score": 0.784351, "selected_n": 290, "p_std_mean": 0.0},
+        {"iteration": 6, "metric": "Accuracy", "score": 0.827586, "selected_n": 290, "p_std_mean": 0.0},
+        {"iteration": 6, "metric": "Macro F1", "score": 0.812255, "selected_n": 290, "p_std_mean": 0.0},
+        {"iteration": 7, "metric": "Accuracy", "score": 0.875862, "selected_n": 290, "p_std_mean": 0.0},
+        {"iteration": 7, "metric": "Macro F1", "score": 0.876188, "selected_n": 290, "p_std_mean": 0.0},
+        {"iteration": 8, "metric": "Accuracy", "score": 0.917241, "selected_n": 290, "p_std_mean": 0.0},
+        {"iteration": 8, "metric": "Macro F1", "score": 0.912505, "selected_n": 290, "p_std_mean": 0.0},
+        {"iteration": 9, "metric": "Accuracy", "score": 0.875862, "selected_n": 290, "p_std_mean": 0.016227},
+        {"iteration": 9, "metric": "Macro F1", "score": 0.842134, "selected_n": 290, "p_std_mean": 0.016227},
+        {"iteration": 10, "metric": "Accuracy", "score": 0.680851, "selected_n": 282, "p_std_mean": 0.363354},
+        {"iteration": 10, "metric": "Macro F1", "score": 0.54962, "selected_n": 282, "p_std_mean": 0.363354}
+      ],
+      "class_metrics": [
+        {"class": "0", "precision": 0.815877, "recall": 0.899265, "f1": 0.855544, "support": 1360, "predicted": 1499},
+        {"class": "1", "precision": 0.798174, "recall": 0.797366, "f1": 0.79777, "support": 987, "predicted": 986},
+        {"class": "2", "precision": 0.886978, "recall": 0.662385, "f1": 0.758403, "support": 545, "predicted": 407}
+      ]
+    },
+    "accessIssues": [
+      {
+        "id": "peak_memory_not_measured",
+        "dataset": "capacity_scenarios",
+        "message": "本次运行没有逐进程峰值 RSS、page faults 或内存带宽遥测；服务器内存结论使用可解释的矩阵下界和规划余量。"
+      },
+      {
+        "id": "target_server_not_benchmarked",
+        "dataset": "capacity_scenarios",
+        "message": "目标服务器尚未运行第 10 轮规模基准；35–42 小时是容量规划区间，不是服务等级保证。"
+      }
+    ]
+  },
+  "sources": [
+    {
+      "id": "analysis_snapshot",
+      "label": "PeerMeta 首窗口执行复核快照",
+      "query": {
+        "engine": "pandas + deterministic trace replay",
+        "description": "交叉核对成功摘要、850 行模型日志、2,892 行预测、逐轮日志和指标文件。",
+        "tables_used": [
+          "output/sg_al_current_quarter_first_window_3year_benchmark_model17_nca_full/benchmark_summary.json",
+          "output/sg_al_current_quarter_first_window_3year_benchmark_model17_nca_full/model_log.csv",
+          "output/sg_al_current_quarter_first_window_3year_benchmark_model17_nca_full/predictions.csv",
+          "output/sg_al_current_quarter_first_window_3year_benchmark_model17_nca_full/iteration_log.csv",
+          "output/sg_al_current_quarter_first_window_3year_benchmark_model17_nca_full/metrics.csv"
+        ]
+      }
+    },
+    {
+      "id": "benchmark_summary",
+      "label": "首窗口成功运行摘要",
+      "path": "output/sg_al_current_quarter_first_window_3year_benchmark_model17_nca_full/benchmark_summary.json",
+      "query": {
+        "engine": "SQLite 3 over reviewed file snapshot",
+        "sql": "SELECT total_wall_seconds / 3600.0 AS wall_hours, accuracy, macro_f1, weighted_f1, total_model_fit_count AS fit_total, train_rows, test_rows FROM benchmark_summary;",
+        "description": "Selects the successful-run headline metrics after loading benchmark_summary.json as a one-row table.",
+        "tables_used": ["benchmark_summary"]
+      }
+    },
+    {
+      "id": "model_log",
+      "label": "850 次逐模型拟合日志",
+      "path": "output/sg_al_current_quarter_first_window_3year_benchmark_model17_nca_full/model_log.csv",
+      "query": {
+        "engine": "SQLite 3 over reviewed CSV snapshot",
+        "sql": "WITH runtimes AS (SELECT model_name AS model, SUM(elapsed_seconds) / 3600.0 AS hours FROM model_log GROUP BY model_name), ranked AS (SELECT model, hours, ROW_NUMBER() OVER (ORDER BY hours DESC) AS runtime_rank, SUM(hours) OVER () AS all_model_hours FROM runtimes) SELECT model, hours, hours / all_model_hours AS share FROM ranked WHERE runtime_rank <= 6 UNION ALL SELECT 'Other 11 models', SUM(hours), SUM(hours) / MAX(all_model_hours) FROM ranked WHERE runtime_rank > 6;",
+        "description": "Aggregates 850 successful fits into the top six model runtimes plus the remaining eleven models.",
+        "tables_used": ["model_log"]
+      }
+    },
+    {
+      "id": "predictions",
+      "label": "2018Q1 测试集预测明细",
+      "path": "output/sg_al_current_quarter_first_window_3year_benchmark_model17_nca_full/predictions.csv",
+      "query": {
+        "engine": "SQLite 3 over reviewed CSV snapshot",
+        "sql": "SELECT iteration, true_label, pred_label, p_std, agreement_rate FROM predictions;",
+        "description": "Selects the fields used to calculate per-iteration quality, class metrics, and uncertainty slices.",
+        "tables_used": ["predictions"]
+      }
+    },
+    {
+      "id": "capacity_replay",
+      "label": "NCA 并发容量与关键路径回放",
+      "path": "output/peermeta_first_window_execution_analysis_20260803/capacity_replay.csv",
+      "query": {
+        "engine": "deterministic scheduling replay",
+        "sql": "SELECT * FROM capacity_replay;",
+        "description": "每轮第一层的完整训练 NCA 与三个 OOF NCA 视为四个独立任务；第二层 NCA 在第一层完成后执行。两通道方案把完整训练放在一条通道、三个 OOF 顺序放在另一条通道。",
+        "tables_used": ["capacity_replay", "model_log"],
+        "metric_definitions": {
+          "memory_lower_bound": "33 * n_samples^2 bytes / 2^30",
+          "planning_memory": "memory_lower_bound * 1.25 + 8 GiB",
+          "trace_replay_total": "replayed NCA critical path + observed 3.11 hours of non-NCA wall time and overhead"
+        }
+      }
+    },
+    {
+      "id": "memory_model",
+      "label": "NCA 第 10 轮矩阵内存模型",
+      "path": "output/peermeta_first_window_execution_analysis_20260803/memory_model.csv",
+      "query": {
+        "engine": "scikit-learn 1.3.2 source inspection",
+        "sql": "SELECT * FROM memory_model;",
+        "tables_used": ["memory_model", "model_log"],
+        "description": "NeighborhoodComponentsAnalysis._loss_grad_lbfgs 常驻 same_class_mask 与四个 n×n 矩阵；33*n² 字节是核心矩阵下界，不是进程峰值 RSS。"
+      }
+    }
+  ],
+  "package_info": {
+    "originUrl": "artifact://peermeta-first-window-execution-analysis-20260803",
+    "controls": {"edit": false, "refresh": false}
+  }
+}

@@ -1,0 +1,5 @@
+scenario,physical_ram_gib,nca_parallel_lanes,safe_schedule,nca_matrix_lower_bound_peak_gib,planning_memory_gib,trace_replay_total_hours,trace_replay_speedup,planning_range_same_per_core_hours,conditional_hours_if_nca_1_3x_to_1_5x
+Current workstation observed,31.65,1,NCA fully serial,31.63,47.53,56.96,1.00,Observed 56.96,Not applicable
+64 GiB conservative,64,2,Full NCA alone then two OOF NCA lanes,31.63,47.53,48.02,1.19,45-50,33-37
+96 GiB recommended,96,2,One full NCA lane plus one lane serially processing three OOF NCA fits,47.99,67.99,34.67,1.64,35-42,24-27
+128 GiB maximum useful concurrency,128,4,Four first-layer NCA fits together then layer-two NCA alone,74.10,100.62,34.66,1.64,35-43,24-27

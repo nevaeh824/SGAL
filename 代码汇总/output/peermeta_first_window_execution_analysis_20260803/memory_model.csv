@@ -1,0 +1,6 @@
+task,iteration_10_fit_rows,lower_bound_gib,can_overlap_in_first_layer
+Layer 1 full train NCA,32079,31.63,Yes
+Layer 1 OOF fold 0 NCA,23072,16.36,Yes
+Layer 1 OOF fold 1 NCA,22207,15.16,Yes
+Layer 1 OOF fold 2 NCA,18879,10.95,Yes
+Layer 2 full train NCA,32079,31.63,No; depends on layer 1 outputs

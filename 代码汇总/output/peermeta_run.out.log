@@ -1,0 +1,1424 @@
+Step 1: 读取数据与构造时间字段
+================================================================================
+原始数据形状: (1743672, 151)
+建模数据形状: (1743672, 151)
+股票数量: 4643
+年份范围: 2015 - 2025
+   code    week  year  week_num  week_order  FSFP_next
+0     1  201501  2015         1      201501          0
+1     1  201502  2015         2      201502          0
+2     1  201503  2015         3      201503          0
+3     1  201504  2015         4      201504          0
+4     1  201505  2015         5      201505          0
+Step 1 完成。
+
+Step 2: 自动识别特征列
+================================================================================
+特征数量: 143
+Step 2 完成。
+
+Step 3: 构造年度滚动窗口
+================================================================================
+   window_id train_period  ... train_stock_count  test_stock_count
+0          1    2015-2017  ...              2831              3261
+1          2    2016-2018  ...              3262              3369
+2          3    2017-2019  ...              3369              3530
+3          4    2018-2020  ...              3530              3849
+4          5    2019-2021  ...              3850              4198
+5          6    2020-2022  ...              4198              4442
+6          7    2021-2023  ...              4442              4625
+7          8    2022-2024  ...              4625              4638
+
+[8 rows x 7 columns]
+共生成 8 个窗口。
+Step 3 完成。
+
+Step 4: 窗口内缺失值填补
+================================================================================
+   window_id  feature_count  train_missing_after  test_missing_after
+0          1            143                    0                   0
+1          2            143                    0                   0
+2          3            143                    0                   0
+3          4            143                    0                   0
+4          5            143                    0                   0
+5          6            143                    0                   0
+6          7            143                    0                   0
+7          8            143                    0                   0
+Step 4 完成。
+
+Step 5: 窗口内标准化
+================================================================================
+   window_id  feature_count  train_missing_after  test_missing_after
+0          1            143                    0                   0
+1          2            143                    0                   0
+2          3            143                    0                   0
+3          4            143                    0                   0
+4          5            143                    0                   0
+5          6            143                    0                   0
+6          7            143                    0                   0
+7          8            143                    0                   0
+Step 5 完成。
+
+Step 6: 最终窗口数据检查
+================================================================================
+   window_id  ...                  test_label_dist
+0          1  ...   {0: 69437, 1: 51864, 2: 28954}
+1          2  ...   {0: 72665, 1: 50349, 2: 46163}
+2          3  ...   {0: 71879, 1: 49809, 2: 53500}
+3          4  ...   {0: 79415, 1: 42365, 2: 68467}
+4          5  ...   {0: 88230, 1: 50993, 2: 61955}
+5          6  ...  {0: 102171, 1: 53417, 2: 60394}
+6          7  ...  {0: 110681, 1: 51332, 2: 69566}
+7          8  ...    {0: 30089, 1: 8525, 2: 21518}
+
+[8 rows x 11 columns]
+
+全部完成。
+后续模型训练统一使用：
+window_preprocessed_data[window_id]['X_train']
+window_preprocessed_data[window_id]['y_train']
+window_preprocessed_data[window_id]['X_test']
+window_preprocessed_data[window_id]['y_test']
+Step 9: 定义扩展模型池、GPU 版 FNN 和评价指标
+================================================================================
+识别到的类别标签: [0, 1, 2]
+类别数量: 3
+PyTorch 版本: 2.2.2+cu118
+当前 FNN 训练设备: cuda
+GPU 名称: NVIDIA GeForce RTX 5060 Ti
+
+当前已定义模型数量: 24
+
+当前可用模型：
+['LDA', 'QDA', 'Logit', 'RidgeClassifier', 'SGD_LogLoss', 'SGD_Hinge', 'PassiveAggressive', 'Perceptron', 'NaiveBayes_Gaussian', 'NaiveBayes_Bernoulli', 'Tree_CART', 'Tree_ID3_approx', 'Tree_C45_approx', 'RandomForest', 'ExtraTrees', 'HistGradientBoosting', 'AdaBoost', 'BaggingTree', 'SVM_LinearSVC', 'NearestCentroid', 'FNN1', 'FNN2', 'FNN2_Dropout', 'FNN3_Wide']
+
+可选模型安装状态：
+      model                              status
+0   XGBoost  not available: ModuleNotFoundError
+1  LightGBM  not available: ModuleNotFoundError
+2  CatBoost  not available: ModuleNotFoundError
+
+Step 9 完成：已定义扩展模型池、GPU 版 FNN 和多分类评价指标。
+================================================================================
+Step 11: 定义 SG-AL 主流程函数
+================================================================================
+
+Step 11 完成：SG-AL 主流程函数已定义。
+================================================================================
+Step 12: 运行 SG-AL 实验
+================================================================================
+本次 SG-AL 使用的模型：
+['RidgeClassifier', 'SGD_LogLoss', 'PassiveAggressive', 'Perceptron', 'NaiveBayes_Gaussian', 'NearestCentroid']
+
+SG-AL 参数设置：
+特征版本: scaled
+运行窗口: None
+实际窗口数量: 8
+d_per_round: None
+consensus_fraction: 0.2
+max_iterations: None
+verbose: True
+
+SG-AL 评价类别标签: [0, 1, 2]
+
+SG-AL 本次运行模型：
+['RidgeClassifier', 'SGD_LogLoss', 'PassiveAggressive', 'Perceptron', 'NaiveBayes_Gaussian', 'NearestCentroid']
+
+窗口 1 | 训练: 2015-2017 | 测试: 2018-2018 | 训练样本: 349934 | 测试样本: 150255 | 每轮反馈: 30051
+  Iter 1: train=349934, remaining_test=150255
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 2: train=379985, remaining_test=120204
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 3: train=410036, remaining_test=90153
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 4: train=440087, remaining_test=60102
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 5: train=470138, remaining_test=30051
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  窗口 1 完成 | accuracy=0.9656, macro_f1=0.9576, weighted_f1=0.9657
+
+窗口 2 | 训练: 2016-2018 | 测试: 2019-2019 | 训练样本: 394352 | 测试样本: 169177 | 每轮反馈: 33835
+  Iter 1: train=394352, remaining_test=169177
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 2: train=428187, remaining_test=135342
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 3: train=462022, remaining_test=101507
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 4: train=495857, remaining_test=67672
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 5: train=529692, remaining_test=33837
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 6: train=563527, remaining_test=2
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  窗口 2 完成 | accuracy=0.9751, macro_f1=0.9730, weighted_f1=0.9750
+
+窗口 3 | 训练: 2017-2019 | 测试: 2020-2020 | 训练样本: 447688 | 测试样本: 175188 | 每轮反馈: 35037
+  Iter 1: train=447688, remaining_test=175188
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 2: train=482725, remaining_test=140151
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 3: train=517762, remaining_test=105114
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 4: train=552799, remaining_test=70077
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 5: train=587836, remaining_test=35040
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 6: train=622873, remaining_test=3
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  窗口 3 完成 | accuracy=0.9616, macro_f1=0.9581, weighted_f1=0.9615
+
+窗口 4 | 训练: 2018-2020 | 测试: 2021-2021 | 训练样本: 494620 | 测试样本: 190247 | 每轮反馈: 38049
+  Iter 1: train=494620, remaining_test=190247
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 2: train=532669, remaining_test=152198
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 3: train=570718, remaining_test=114149
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 4: train=608767, remaining_test=76100
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 5: train=646816, remaining_test=38051
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 6: train=684865, remaining_test=2
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  窗口 4 完成 | accuracy=0.9732, macro_f1=0.9685, weighted_f1=0.9731
+
+窗口 5 | 训练: 2019-2021 | 测试: 2022-2022 | 训练样本: 534612 | 测试样本: 201178 | 每轮反馈: 40235
+  Iter 1: train=534612, remaining_test=201178
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 2: train=574847, remaining_test=160943
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 3: train=615082, remaining_test=120708
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 4: train=655317, remaining_test=80473
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 5: train=695552, remaining_test=40238
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 6: train=735787, remaining_test=3
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  窗口 5 完成 | accuracy=0.9328, macro_f1=0.9221, weighted_f1=0.9331
+
+窗口 6 | 训练: 2020-2022 | 测试: 2023-2023 | 训练样本: 566613 | 测试样本: 215982 | 每轮反馈: 43196
+  Iter 1: train=566613, remaining_test=215982
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 2: train=609809, remaining_test=172786
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 3: train=653005, remaining_test=129590
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 4: train=696201, remaining_test=86394
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 5: train=739397, remaining_test=43198
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 6: train=782593, remaining_test=2
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  窗口 6 完成 | accuracy=0.9711, macro_f1=0.9660, weighted_f1=0.9711
+
+窗口 7 | 训练: 2021-2023 | 测试: 2024-2024 | 训练样本: 607407 | 测试样本: 231579 | 每轮反馈: 46315
+  Iter 1: train=607407, remaining_test=231579
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 2: train=653722, remaining_test=185264
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 3: train=700037, remaining_test=138949
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 4: train=746352, remaining_test=92634
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 5: train=792667, remaining_test=46319
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 6: train=838982, remaining_test=4
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  窗口 7 完成 | accuracy=0.9743, macro_f1=0.9685, weighted_f1=0.9742
+
+窗口 8 | 训练: 2022-2024 | 测试: 2025-2025 | 训练样本: 648739 | 测试样本: 60132 | 每轮反馈: 12026
+  Iter 1: train=648739, remaining_test=60132
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 2: train=660765, remaining_test=48106
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 3: train=672791, remaining_test=36080
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 4: train=684817, remaining_test=24054
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 5: train=696843, remaining_test=12028
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  Iter 6: train=708869, remaining_test=2
+    layer_1 | RidgeClassifier 开始
+    layer_1 | RidgeClassifier 完成: success
+    layer_1 | SGD_LogLoss 开始
+    layer_1 | SGD_LogLoss 完成: success
+    layer_1 | PassiveAggressive 开始
+    layer_1 | PassiveAggressive 完成: success
+    layer_1 | Perceptron 开始
+    layer_1 | Perceptron 完成: success
+    layer_1 | NaiveBayes_Gaussian 开始
+    layer_1 | NaiveBayes_Gaussian 完成: success
+    layer_1 | NearestCentroid 开始
+    layer_1 | NearestCentroid 完成: success
+    layer_2 | RidgeClassifier 开始
+    layer_2 | RidgeClassifier 完成: success
+    layer_2 | SGD_LogLoss 开始
+    layer_2 | SGD_LogLoss 完成: success
+    layer_2 | PassiveAggressive 开始
+    layer_2 | PassiveAggressive 完成: success
+    layer_2 | Perceptron 开始
+    layer_2 | Perceptron 完成: success
+    layer_2 | NaiveBayes_Gaussian 开始
+    layer_2 | NaiveBayes_Gaussian 完成: success
+    layer_2 | NearestCentroid 开始
+    layer_2 | NearestCentroid 完成: success
+  窗口 8 完成 | accuracy=0.9742, macro_f1=0.9582, weighted_f1=0.9737
+
+SG-AL 总运行时间: 1690.79s 约 28.18 分钟
+
+SG-AL 窗口级结果：
+   window_id train_period test_period  ...  recall_2      f1_2  support_2
+0          1    2015-2017   2018-2018  ...  0.973786  0.930206      28954
+1          2    2016-2018   2019-2019  ...  0.970388  0.970367      46163
+2          3    2017-2019   2020-2020  ...  0.951813  0.952989      53500
+3          4    2018-2020   2021-2021  ...  0.978851  0.968616      68467
+4          5    2019-2021   2022-2022  ...  0.922815  0.909797      61955
+5          6    2020-2022   2023-2023  ...  0.971355  0.963593      60394
+6          7    2021-2023   2024-2024  ...  0.977863  0.970109      69566
+7          8    2022-2024   2025-2025  ...  0.993308  0.972142      21518
+
+[8 rows x 21 columns]
+
+SG-AL pooled 结果：
+   sample_count feature_version  ...  total_seconds  total_minutes
+0       1393738          scaled  ...    1690.788606       28.17981
+
+[1 rows x 20 columns]
+
+SG-AL 迭代日志：
+    window_id test_period  ...  mean_s_tilde  mean_agreement_rate
+0           1   2018-2018  ...      0.000000             1.000000
+1           1   2018-2018  ...      0.000000             1.000000
+2           1   2018-2018  ...      0.000000             1.000000
+3           1   2018-2018  ...      0.000000             1.000000
+4           1   2018-2018  ...      0.106381             0.940340
+5           2   2019-2019  ...      0.000000             1.000000
+6           2   2019-2019  ...      0.000000             1.000000
+7           2   2019-2019  ...      0.000000             1.000000
+8           2   2019-2019  ...      0.108857             0.951318
+9           2   2019-2019  ...      0.380298             0.816467
+10          2   2019-2019  ...      0.500000             0.500000
+11          3   2020-2020  ...      0.000000             1.000000
+12          3   2020-2020  ...      0.000000             1.000000
+13          3   2020-2020  ...      0.000000             1.000000
+14          3   2020-2020  ...      0.000000             1.000000
+15          3   2020-2020  ...      0.260565             0.835745
+16          3   2020-2020  ...      0.542035             0.666667
+17          4   2021-2021  ...      0.000000             1.000000
+18          4   2021-2021  ...      0.000000             1.000000
+19          4   2021-2021  ...      0.000000             1.000000
+20          4   2021-2021  ...      0.000000             1.000000
+21          4   2021-2021  ...      0.168106             0.900427
+22          4   2021-2021  ...      0.000000             1.000000
+23          5   2022-2022  ...      0.000000             1.000000
+24          5   2022-2022  ...      0.000000             1.000000
+25          5   2022-2022  ...      0.000000             1.000000
+26          5   2022-2022  ...      0.000000             1.000000
+27          5   2022-2022  ...      0.216283             0.852686
+28          5   2022-2022  ...      0.314270             0.777778
+29          6   2023-2023  ...      0.000000             1.000000
+30          6   2023-2023  ...      0.000000             1.000000
+31          6   2023-2023  ...      0.000000             1.000000
+32          6   2023-2023  ...      0.000000             1.000000
+33          6   2023-2023  ...      0.110166             0.936661
+34          6   2023-2023  ...      0.235702             0.833333
+35          7   2024-2024  ...      0.000000             1.000000
+36          7   2024-2024  ...      0.000000             1.000000
+37          7   2024-2024  ...      0.000000             1.000000
+38          7   2024-2024  ...      0.000000             1.000000
+39          7   2024-2024  ...      0.079299             0.948357
+40          7   2024-2024  ...      0.592865             0.625000
+41          8   2025-2025  ...      0.000000             1.000000
+42          8   2025-2025  ...      0.000000             1.000000
+43          8   2025-2025  ...      0.000000             1.000000
+44          8   2025-2025  ...      0.000000             1.000000
+45          8   2025-2025  ...      0.243202             0.875603
+46          8   2025-2025  ...      0.687184             0.500000
+
+[47 rows x 7 columns]
+
+SG-AL 模型运行状态摘要：
+      layer           model_name   status  count
+0   layer_1  NaiveBayes_Gaussian  success     47
+1   layer_1      NearestCentroid  success     47
+2   layer_1    PassiveAggressive  success     47
+3   layer_1           Perceptron  success     47
+4   layer_1      RidgeClassifier  success     47
+5   layer_1          SGD_LogLoss  success     47
+6   layer_2  NaiveBayes_Gaussian  success     47
+7   layer_2      NearestCentroid  success     47
+8   layer_2    PassiveAggressive  success     47
+9   layer_2           Perceptron  success     47
+10  layer_2      RidgeClassifier  success     47
+11  layer_2          SGD_LogLoss  success     47
+所有 SG-AL 子模型均运行成功。
+
+SG-AL 窗口平均结果：
+  model_name  window_count  total_seconds  ...  accuracy  macro_f1  weighted_f1
+0      SG-AL             8    1690.788606  ...  0.965983  0.958998      0.96593
+
+[1 rows x 22 columns]
+
+Step 12 完成：SG-AL 实验已运行。
+================================================================================
+
+SG-AL 结果已保存到：C:\Users\chenyu\Desktop\财务造假\代码汇总\output
